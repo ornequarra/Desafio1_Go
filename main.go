@@ -100,19 +100,22 @@ func main() {
 			totalTickets++
 		}
 
-		porcentaje, err := storage.AverageDestination(entrada, storage.Tickets)
+		porcentaje, err := storage.AverageDestination(entradaPorcentaje, storage.Tickets)
 		if err != nil {
 			canalErr <- err
 			return
 		}
-		mensaje := fmt.Sprintf("El porcentaje de personas que viajan al destino %s es %.2f.", entradaRangoHorario, porcentaje)
+		mensaje := fmt.Sprintf("El porcentaje de personas que viajan al destino %s es %.2f.", entradaPorcentaje, porcentaje)
+
 		canalPorcentajePorDestino <- mensaje
 	}(canalPorcentajePorDestino, canalErr)
+
+	time.Sleep(time.Millisecond * 100)
 
 	//Impresion de Canales
 	select {
 	case totalTicket := <-canalTotalTickets:
-		fmt.Printf("El total de tickets para el país %s es: %s\n", entrada, totalTicket)
+		fmt.Println(totalTicket)
 	case entradaRangoHorario := <-canalViajantesPorHorario:
 		fmt.Println(entradaRangoHorario)
 	case porcentajePorDestino := <-canalPorcentajePorDestino:
