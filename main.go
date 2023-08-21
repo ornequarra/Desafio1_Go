@@ -24,11 +24,14 @@ func main() {
 	}
 
 	//Crear Canales para comunicarnos con las GoRoutines
-	canalTotalTickets := make(chan int)
+	canalTotalTickets := make(chan string)
 	defer close(canalTotalTickets)
 
 	canalViajantesPorHorario := make(chan string)
 	defer close(canalViajantesPorHorario)
+
+	canalPorcentajePorDestino := make(chan string)
+	defer close(canalPorcentajePorDestino)
 
 	canalErr := make(chan error)
 	defer close(canalErr)
@@ -44,13 +47,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	go func(chan int, chan error) {
+	go func(chan string, chan error) {
 		totalTickets, err := storage.GetTotalTickets(entrada)
 		if err != nil {
 			canalErr <- err
 			return
 		}
-		canalTotalTickets <- totalTickets
+		mensaje := fmt.Sprintf("El total de tickets para el pais %s es: %d", entrada, totalTickets)
+		canalTotalTickets <- mensaje
 	}(canalTotalTickets, canalErr)
 
 	//Requerimiento 2: Contar total de viajantes por rango horario
@@ -74,12 +78,40 @@ func main() {
 		canalViajantesPorHorario <- mensaje
 	}(canalViajantesPorHorario, canalErr)
 
+	//Requerimiento 3: Contar total de viajantes por rango horario
+	var entradaPorcentaje string
+
+	fmt.Print("Ingrese pais elegido para calcular el porcentaje: ")
+	_, err3 := fmt.Scan(&entradaPorcentaje)
+
+	if err3 != nil {
+		log.Fatal(err3)
+		os.Exit(1)
+	}
+
+	go func(chan string, chan error) {
+		totalTickets := 0
+		for i := 0; i < len(storage.Tickets); i++ {
+			totalTickets++
+		}
+
+		porcentaje, err := tickets.AverageDestination(entradaPorcentaje, totalTickets)
+		if err != nil {
+			canalErr <- err
+			return
+		}
+		mensaje := fmt.Sprintf("El porcentaje de personas que viajan al destino %s es %d.", entradaRangoHorario, porcentaje)
+		canalPorcentajePorDestino <- mensaje
+	}(canalPorcentajePorDestino, canalErr)
+
 	//Impresion de Canales
 	select {
 	case totalTicket := <-canalTotalTickets:
-		fmt.Println("El total de tickets para el pais %s es: %d", entrada, totalTicket)
+		fmt.Println(totalTicket)
 	case ticketPorHorario := <-canalViajantesPorHorario:
 		fmt.Println(ticketPorHorario)
+	case porcentajePorDestino := <-canalPorcentajePorDestino:
+		fmt.Println(porcentajePorDestino)
 	case err := <-canalErr:
 		fmt.Println(err)
 		os.Exit(1)
