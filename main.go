@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/ornequarra/Desafio1_Go/internal/tickets"
 )
@@ -45,13 +46,15 @@ func main() {
 	}
 
 	go func(chan int, chan error) {
-		totalTickets, err := storage.GetTotalTickets(entrada)
+		totalTickets, err := storage.GetTotalTickets(entrada, storage.Tickets)
 		if err != nil {
 			canalErr <- err
 			return
 		}
 		canalTotalTickets <- totalTickets
 	}(canalTotalTickets, canalErr)
+
+	time.Sleep(time.Millisecond * 100)
 
 	//Requerimiento 2: Contar total de viajantes por rango horario
 	var entradaRangoHorario string
@@ -65,19 +68,21 @@ func main() {
 	}
 
 	go func(chan string, chan error) {
-		totalTickets, err := storage.GetCountByPeriod(entradaRangoHorario)
+		totalTickets, err := storage.GetCountByPeriod(entradaRangoHorario, storage.Tickets)
 		if err != nil {
 			canalErr <- err
 			return
 		}
-		mensaje := fmt.Sprintf("La cantidad de viajantes en el rango %s es %d.", entradaRangoHorario, totalTickets)
+		mensaje := fmt.Sprintf("La cantidad de viajantes en el rango %s es %d\n.", entradaRangoHorario, totalTickets)
 		canalViajantesPorHorario <- mensaje
 	}(canalViajantesPorHorario, canalErr)
+
+	time.Sleep(time.Millisecond * 100)
 
 	//Impresion de Canales
 	select {
 	case totalTicket := <-canalTotalTickets:
-		fmt.Println("El total de tickets para el pais %s es: %d", entrada, totalTicket)
+		fmt.Printf("El total de tickets para el país %s es: %d\n", entrada, totalTicket)
 	case ticketPorHorario := <-canalViajantesPorHorario:
 		fmt.Println(ticketPorHorario)
 	case err := <-canalErr:
