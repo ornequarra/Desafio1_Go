@@ -31,6 +31,9 @@ func main() {
 	canalViajantesPorHorario := make(chan string)
 	defer close(canalViajantesPorHorario)
 
+	canalPorcentajePorDestino := make(chan string)
+	defer close(canalPorcentajePorDestino)
+
 	canalErr := make(chan error)
 	defer close(canalErr)
 
@@ -46,7 +49,7 @@ func main() {
 	}
 
 	go func(chan int, chan error) {
-		totalTickets, err := storage.GetTotalTickets(entrada, storage.Tickets)
+		totalTickets, err := storage.GetTotalTicketsByDestination(entrada, storage.Tickets)
 		if err != nil {
 			canalErr <- err
 			return
@@ -79,12 +82,40 @@ func main() {
 
 	time.Sleep(time.Millisecond * 100)
 
+	//Requerimiento 3: Contar total de viajantes por rango horario
+	var entradaPorcentaje string
+
+	fmt.Print("Ingrese pais elegido para calcular el porcentaje: ")
+	_, err3 := fmt.Scan(&entradaPorcentaje)
+
+	if err3 != nil {
+		log.Fatal(err3)
+		os.Exit(1)
+	}
+
+	go func(chan string, chan error) {
+		totalTickets := 0
+		for i := 0; i < len(storage.Tickets); i++ {
+			totalTickets++
+		}
+
+		porcentaje, err := storage.AverageDestination(entrada, storage.Tickets)
+		if err != nil {
+			canalErr <- err
+			return
+		}
+		mensaje := fmt.Sprintf("El porcentaje de personas que viajan al destino %s es %.2f.", entradaRangoHorario, porcentaje)
+		canalPorcentajePorDestino <- mensaje
+	}(canalPorcentajePorDestino, canalErr)
+
 	//Impresion de Canales
 	select {
 	case totalTicket := <-canalTotalTickets:
 		fmt.Printf("El total de tickets para el país %s es: %d\n", entrada, totalTicket)
-	case ticketPorHorario := <-canalViajantesPorHorario:
-		fmt.Println(ticketPorHorario)
+	case entradaRangoHorario := <-canalViajantesPorHorario:
+		fmt.Println(entradaRangoHorario)
+	case porcentajePorDestino := <-canalPorcentajePorDestino:
+		fmt.Println(porcentajePorDestino)
 	case err := <-canalErr:
 		fmt.Println(err)
 		os.Exit(1)

@@ -52,7 +52,7 @@ func ReadFile(filename string) []Ticket {
 }
 
 // Requerimiento 1
-func (s Storage) GetTotalTickets(destination string, tickets []Ticket) (int, error) {
+func (s Storage) GetTotalTicketsByDestination(destination string, tickets []Ticket) (int, error) {
 	var contador int = 0
 	for _, ticket := range tickets {
 		if ticket.paisDestino == destination {
@@ -97,5 +97,11 @@ func (s Storage) GetCountByPeriod(time string, tickets []Ticket) (int, error) {
 	return contador, nil
 }
 
-// Requerimiento 3
-func AverageDestination(destination string, total int) (int, error) { return 0, nil }
+// Punto 3 - Porcentaje de personas
+func (s Storage) AverageDestination(destino string, tickets []Ticket) (float64, error) {
+	total, err := Storage.GetTotalTicketsByDestination(s, destino, tickets)
+	if err != nil {
+		return 0.0, err
+	}
+	return (float64(total) * 100) / float64(len(tickets)), nil
+}
