@@ -53,7 +53,8 @@ func ReadFile(filename string) []Ticket {
 func (s Storage) GetTotalTickets(destination string) (int, error) {}
 
 // Requerimiento 2
-func GetMornings(time string) (int, error) {}
+// func GetMornings(time string) (int, error) {}
+func (s Storage) GetCountByPeriod(time string) (int, error) {}
 
 // Requerimiento 3
 func AverageDestination(destination string, total int) (int, error) {}
