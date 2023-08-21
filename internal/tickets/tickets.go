@@ -1,6 +1,7 @@
 package tickets
 
 import (
+	"errors"
 	"os"
 	"strings"
 )
@@ -50,10 +51,21 @@ func ReadFile(filename string) []Ticket {
 }
 
 // Requerimiento 1
-func (s Storage) GetTotalTickets(destination string) (int, error) {}
+func (s Storage) GetTotalTickets(destination string, tickets []Ticket) (int, error) {
+	var contador int = 0
+	for _, ticket := range tickets {
+		if ticket.paisDestino == destination {
+			contador++
+		}
+	}
+	if contador == 0 {
+		return contador, errors.New("No se encontraron viajes en ese país")
+	}
+	return contador, nil
+}
 
 // Requerimiento 2
-func GetMornings(time string) (int, error) {}
+func GetMornings(time string) (int, error) { return 0, nil }
 
 // Requerimiento 3
-func AverageDestination(destination string, total int) (int, error) {}
+func AverageDestination(destination string, total int) (int, error) { return 0, nil }
