@@ -98,8 +98,8 @@ func (s Storage) GetCountByPeriod(time string, tickets []Ticket) (int, error) {
 }
 
 // Punto 3 - Porcentaje de personas
-func (s Storage) AverageDestination(destino string, tickets []Ticket) (float64, error) {
-	total, err := Storage.GetTotalTicketsByDestination(s, destino, tickets)
+func (s Storage) AverageDestination(destination string, tickets []Ticket) (float64, error) {
+	total, err := Storage.GetTotalTicketsByDestination(s, destination, tickets)
 	if err != nil {
 		return 0.0, err
 	}

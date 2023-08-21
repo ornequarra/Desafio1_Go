@@ -25,7 +25,7 @@ func main() {
 	}
 
 	//Crear Canales para comunicarnos con las GoRoutines
-	canalTotalTickets := make(chan int)
+	canalTotalTickets := make(chan string)
 	defer close(canalTotalTickets)
 
 	canalViajantesPorHorario := make(chan string)
@@ -48,13 +48,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	go func(chan int, chan error) {
+	go func(chan string, chan error) {
 		totalTickets, err := storage.GetTotalTicketsByDestination(entrada, storage.Tickets)
 		if err != nil {
 			canalErr <- err
 			return
 		}
-		canalTotalTickets <- totalTickets
+		mensaje := fmt.Sprintf("El total de tickets para el pais %s es: %d\n.", entrada, totalTickets)
+		canalTotalTickets <- mensaje
 	}(canalTotalTickets, canalErr)
 
 	time.Sleep(time.Millisecond * 100)
@@ -111,7 +112,7 @@ func main() {
 	//Impresion de Canales
 	select {
 	case totalTicket := <-canalTotalTickets:
-		fmt.Printf("El total de tickets para el país %s es: %d\n", entrada, totalTicket)
+		fmt.Printf("El total de tickets para el país %s es: %s\n", entrada, totalTicket)
 	case entradaRangoHorario := <-canalViajantesPorHorario:
 		fmt.Println(entradaRangoHorario)
 	case porcentajePorDestino := <-canalPorcentajePorDestino:
