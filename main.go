@@ -47,8 +47,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	go func(chan string, chan error) {
-		totalTickets, err := storage.GetTotalTickets(entrada)
+	go func(chan int, chan error) {
+		totalTickets, err := storage.GetTotalTickets((entrada), storage.Tickets)
+
 		if err != nil {
 			canalErr <- err
 			return
@@ -107,7 +108,7 @@ func main() {
 	//Impresion de Canales
 	select {
 	case totalTicket := <-canalTotalTickets:
-		fmt.Println(totalTicket)
+    		fmt.Println(totalTicket)
 	case ticketPorHorario := <-canalViajantesPorHorario:
 		fmt.Println(ticketPorHorario)
 	case porcentajePorDestino := <-canalPorcentajePorDestino:
