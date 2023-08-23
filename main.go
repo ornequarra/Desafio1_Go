@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/ornequarra/Desafio1_Go/internal/tickets"
 )
@@ -48,7 +49,7 @@ func main() {
 	}
 
 	go func(chan int, chan error) {
-		totalTickets, err := storage.GetTotalTickets((entrada), storage.Tickets)
+		totalTickets, err := storage.GetTotalTickets(entrada, storage.Tickets)
 
 		if err != nil {
 			canalErr <- err
@@ -57,6 +58,8 @@ func main() {
 		mensaje := fmt.Sprintf("El total de tickets para el pais %s es: %d", entrada, totalTickets)
 		canalTotalTickets <- mensaje
 	}(canalTotalTickets, canalErr)
+
+	time.Sleep(time.Millisecond * 100)
 
 	//Requerimiento 2: Contar total de viajantes por rango horario
 	var entradaRangoHorario string
@@ -70,15 +73,14 @@ func main() {
 	}
 
 	go func(chan string, chan error) {
-		totalTickets, err := storage.GetCountByPeriod(entradaRangoHorario)
+		totalTickets, err := storage.GetCountByPeriod(entradaRangoHorario, storage.Tickets)
 		if err != nil {
 			canalErr <- err
 			return
 		}
-		mensaje := fmt.Sprintf("La cantidad de viajantes en el rango %s es %d.", entradaRangoHorario, totalTickets)
+		mensaje := fmt.Sprintf("La cantidad de viajantes en el rango %s es %d\n.", entradaRangoHorario, totalTickets)
 		canalViajantesPorHorario <- mensaje
 	}(canalViajantesPorHorario, canalErr)
-
 	//Requerimiento 3: Contar total de viajantes por rango horario
 	var entradaPorcentaje string
 
