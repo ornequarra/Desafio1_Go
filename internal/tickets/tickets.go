@@ -67,5 +67,6 @@ func (s Storage) GetTotalTickets(destination string, tickets []Ticket) (int, err
 // Requerimiento 2
 func GetMornings(time string) (int, error) { return 0, nil }
 
+
 // Requerimiento 3
 func AverageDestination(destination string, total int) (int, error) { return 0, nil }
