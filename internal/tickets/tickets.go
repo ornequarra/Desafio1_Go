@@ -98,4 +98,4 @@ func (s Storage) GetCountByPeriod(time string, tickets []Ticket) (int, error) {
 }
 
 // Requerimiento 3
-func AverageDestination(destination string, total int) (int, error) { return 0, nil }
+func AverageDestination(destination string, total int) (float64, error) { return 0, nil }
