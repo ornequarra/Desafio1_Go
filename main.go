@@ -52,7 +52,6 @@ func main() {
 
 		if err != nil {
 			canalErr <- err
-			//return
 		}
 		mensaje := fmt.Sprintf("El total de tickets para el pais %s es: %d.", entrada, totalTickets)
 		canalTotalTickets <- mensaje
@@ -73,7 +72,6 @@ func main() {
 		totalTickets, err := storage.GetCountByPeriod(entradaRangoHorario, storage.Tickets)
 		if err != nil {
 			canalErr <- err
-			//return
 		}
 		mensaje := fmt.Sprintf("La cantidad de viajantes en el rango %s es %d.", entradaRangoHorario, totalTickets)
 		canalViajantesPorHorario <- mensaje
@@ -98,7 +96,6 @@ func main() {
 		porcentaje, err := tickets.AverageDestination(entradaPorcentaje, totalTickets)
 		if err != nil {
 			canalErr <- err
-			//return
 		}
 		mensaje := fmt.Sprintf("El porcentaje de personas que viajan al destino %s es %f.", entradaPorcentaje, porcentaje)
 		canalPorcentajePorDestino <- mensaje
