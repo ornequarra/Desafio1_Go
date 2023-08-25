@@ -36,6 +36,8 @@ func main() {
 	canalErr := make(chan error)
 	defer close(canalErr)
 
+	//Punto 4 - Ejecución de las funciones de manera concurrente:
+
 	//Requerimiento 1: Contar total de tickets
 	var entrada string
 
@@ -48,7 +50,7 @@ func main() {
 	}
 
 	go func(chan string, chan error) {
-		totalTickets, err := storage.GetTotalTickets(entrada, storage.Tickets)
+		totalTickets, err := storage.GetTotalTicketsByDestination(entrada, storage.Tickets)
 
 		if err != nil {
 			canalErr <- err
@@ -73,7 +75,7 @@ func main() {
 		if err != nil {
 			canalErr <- err
 		}
-		mensaje := fmt.Sprintf("La cantidad de viajantes en el rango %s es %d.", entradaRangoHorario, totalTickets)
+		mensaje := fmt.Sprintf("La cantidad de viajantes en el rango %s es: %d.", entradaRangoHorario, totalTickets)
 		canalViajantesPorHorario <- mensaje
 	}(canalViajantesPorHorario, canalErr)
 	//Requerimiento 3: Contar total de viajantes por rango horario
@@ -93,11 +95,11 @@ func main() {
 			totalTickets++
 		}
 
-		porcentaje, err := tickets.AverageDestination(entradaPorcentaje, totalTickets)
+		porcentaje, err := storage.AverageDestination(entradaPorcentaje, storage.Tickets)
 		if err != nil {
 			canalErr <- err
 		}
-		mensaje := fmt.Sprintf("El porcentaje de personas que viajan al destino %s es %f.", entradaPorcentaje, porcentaje)
+		mensaje := fmt.Sprintf("El porcentaje de personas que viajan al destino %s es: %f.", entradaPorcentaje, porcentaje)
 		canalPorcentajePorDestino <- mensaje
 	}(canalPorcentajePorDestino, canalErr)
 

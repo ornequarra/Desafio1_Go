@@ -22,7 +22,7 @@ type Storage struct {
 	Tickets []Ticket
 }
 
-// readFile es una funcion que lee el archivo tickets.csv
+// ReadFile es una funcion que lee el archivo tickets.csv
 func ReadFile(filename string) []Ticket {
 
 	file, err := os.ReadFile(filename)
@@ -52,7 +52,7 @@ func ReadFile(filename string) []Ticket {
 }
 
 // Requerimiento 1
-func (s Storage) GetTotalTickets(destination string, tickets []Ticket) (int, error) {
+func (s Storage) GetTotalTicketsByDestination(destination string, tickets []Ticket) (int, error) {
 	var contador int = 0
 	for _, ticket := range tickets {
 		if ticket.paisDestino == destination {
@@ -98,4 +98,10 @@ func (s Storage) GetCountByPeriod(time string, tickets []Ticket) (int, error) {
 }
 
 // Requerimiento 3
-func AverageDestination(destination string, total int) (float64, error) { return 0, nil }
+func (s Storage) AverageDestination(destination string, tickets []Ticket) (float64, error) {
+	total, err := Storage.GetTotalTicketsByDestination(s, destination, tickets)
+	if err != nil {
+		return 0.0, err
+	}
+	return (float64(total) * 100) / float64(len(tickets)), nil
+}
