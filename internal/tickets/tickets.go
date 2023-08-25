@@ -22,7 +22,7 @@ type Storage struct {
 	Tickets []Ticket
 }
 
-// readFile es una funcion que lee el archivo tickets.csv
+// ReadFile es una funcion que lee el archivo tickets.csv
 func ReadFile(filename string) []Ticket {
 
 	file, err := os.ReadFile(filename)
@@ -97,7 +97,7 @@ func (s Storage) GetCountByPeriod(time string, tickets []Ticket) (int, error) {
 	return contador, nil
 }
 
-// Punto 3 - Porcentaje de personas
+// Requerimiento 3
 func (s Storage) AverageDestination(destination string, tickets []Ticket) (float64, error) {
 	total, err := Storage.GetTotalTicketsByDestination(s, destination, tickets)
 	if err != nil {

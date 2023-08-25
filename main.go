@@ -37,6 +37,8 @@ func main() {
 	canalErr := make(chan error)
 	defer close(canalErr)
 
+	//Punto 4 - Ejecución de las funciones de manera concurrente:
+
 	//Requerimiento 1: Contar total de tickets
 	var entrada string
 
