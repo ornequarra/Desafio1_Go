@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"github.com/ornequarra/Desafio1_Go/internal/tickets"
 )
@@ -42,7 +41,7 @@ func main() {
 	//Requerimiento 1: Contar total de tickets
 	var entrada string
 
-	fmt.Print("Ingrese pais a buscar :")
+	fmt.Print("Ingrese pais a buscar: ")
 	_, err := fmt.Scan(&entrada)
 
 	if err != nil {
@@ -52,20 +51,18 @@ func main() {
 
 	go func(chan string, chan error) {
 		totalTickets, err := storage.GetTotalTicketsByDestination(entrada, storage.Tickets)
+
 		if err != nil {
 			canalErr <- err
-			return
 		}
-		mensaje := fmt.Sprintf("El total de tickets para el pais %s es: %d\n.", entrada, totalTickets)
+		mensaje := fmt.Sprintf("El total de tickets para el pais %s es: %d.", entrada, totalTickets)
 		canalTotalTickets <- mensaje
 	}(canalTotalTickets, canalErr)
-
-	time.Sleep(time.Millisecond * 100)
 
 	//Requerimiento 2: Contar total de viajantes por rango horario
 	var entradaRangoHorario string
 
-	fmt.Print("Ingrese rango horario a buscar :")
+	fmt.Print("Ingrese rango horario a buscar: ")
 	_, err2 := fmt.Scan(&entradaRangoHorario)
 
 	if err2 != nil {
@@ -77,14 +74,10 @@ func main() {
 		totalTickets, err := storage.GetCountByPeriod(entradaRangoHorario, storage.Tickets)
 		if err != nil {
 			canalErr <- err
-			return
 		}
-		mensaje := fmt.Sprintf("La cantidad de viajantes en el rango %s es %d\n.", entradaRangoHorario, totalTickets)
+		mensaje := fmt.Sprintf("La cantidad de viajantes en el rango %s es: %d.", entradaRangoHorario, totalTickets)
 		canalViajantesPorHorario <- mensaje
 	}(canalViajantesPorHorario, canalErr)
-
-	time.Sleep(time.Millisecond * 100)
-
 	//Requerimiento 3: Contar total de viajantes por rango horario
 	var entradaPorcentaje string
 
@@ -105,25 +98,22 @@ func main() {
 		porcentaje, err := storage.AverageDestination(entradaPorcentaje, storage.Tickets)
 		if err != nil {
 			canalErr <- err
-			return
 		}
-		mensaje := fmt.Sprintf("El porcentaje de personas que viajan al destino %s es %.2f.", entradaPorcentaje, porcentaje)
-
+		mensaje := fmt.Sprintf("El porcentaje de personas que viajan al destino %s es: %f.", entradaPorcentaje, porcentaje)
 		canalPorcentajePorDestino <- mensaje
 	}(canalPorcentajePorDestino, canalErr)
 
-	time.Sleep(time.Millisecond * 100)
-
 	//Impresion de Canales
-	select {
-	case totalTicket := <-canalTotalTickets:
-		fmt.Println(totalTicket)
-	case entradaRangoHorario := <-canalViajantesPorHorario:
-		fmt.Println(entradaRangoHorario)
-	case porcentajePorDestino := <-canalPorcentajePorDestino:
-		fmt.Println(porcentajePorDestino)
-	case err := <-canalErr:
-		fmt.Println(err)
-		os.Exit(1)
+	for i := 0; i < 3; i++ {
+		select {
+		case totalTicket := <-canalTotalTickets:
+			fmt.Println(totalTicket)
+		case ticketPorHorario := <-canalViajantesPorHorario:
+			fmt.Println(ticketPorHorario)
+		case porcentajePorDestino := <-canalPorcentajePorDestino:
+			fmt.Println(porcentajePorDestino)
+		case err := <-canalErr:
+			fmt.Println("Error:", err)
+		}
 	}
 }
